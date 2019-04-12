@@ -1,12 +1,13 @@
 FROM node:4.3.2
 
+RUN apk add --update \
+    curl \
+    && rm -rf /var/cache/apk/*
+
 RUN useradd --user-group --create-home --shell /bin/false app &&\
   npm install --global npm@3.7.5
 
 ENV HOME=/home/app
-
-RUN apt-get update
-RUN apt-get install curl wget
 
 COPY package.json npm-shrinkwrap.json $HOME/library/
 RUN chown -R app:app $HOME/*
