@@ -1,24 +1,19 @@
-FROM node:4.3.2
+FROM node:8
 
-RUN apk add --update \
-    curl \
-    && rm -rf /var/cache/apk/*
+# Create app directory
+WORKDIR /usr/src/app
 
-RUN useradd --user-group --create-home --shell /bin/false app &&\
-  npm install --global npm@3.7.5
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY package*.json ./
 
-ENV HOME=/home/app
+RUN npm install
+# If you are building your code for production
+# RUN npm ci --only=production
 
-COPY package.json npm-shrinkwrap.json $HOME/library/
-RUN chown -R app:app $HOME/*
+# Bundle app source
+COPY . .
 
-USER app
-WORKDIR $HOME/library
-RUN npm cache clean && npm install --silent --progress=false
-
-USER root
-COPY . $HOME/library
-RUN chown -R app:app $HOME/*
-USER app
-
-CMD ["npm", "start"]
+EXPOSE 8080
+CMD [ "npm", "start" ]
